@@ -72,6 +72,38 @@ classmate on the same assignment — gets flagged. A shared cheat sheet
 or one student's essay submitted under another name lights up both
 baselines. (Scores from the bundled toy corpus; re-run on real data.)
 
+## Validation on real prose (Project Gutenberg)
+
+Short informal writing separates well. Long-form literary prose is
+harder — and we publish the miss, not just the hits. Three public-domain
+authors (Twain, Austen, Doyle), ~500-word passages from different parts
+of each book, default bands:
+
+| Baseline ↓ / Held-out → | Twain | Austen | Doyle |
+|---|---|---|---|
+| **Twain** | 0.99 consistent | 1.06 consistent | 1.12 consistent |
+| **Austen** | 1.11 consistent | 0.78 consistent | 0.74 consistent |
+| **Doyle** | 1.11 consistent | 1.03 consistent | 0.84 consistent |
+
+Two findings:
+
+1. **Within-author stability holds on real data.** Every held-out
+   passage reads *consistent* against its own author's baseline —
+   the method recognizes the same hand across different chapters.
+2. **Cross-author separation fails here.** Twain, Austen, and Doyle
+   all read "consistent" against each other's baselines. Long formal
+   prose shares function-word distributions; the habit markers that
+   separate casual student writing (contractions, first person,
+   exclamation) barely vary across novels. Even dialogue density
+   (Twain/Doyle quote heavily, Austen doesn't) proved scene-dependent
+   rather than author-stable, so it was left out.
+
+Honest scope: Writeprint distinguishes voices with strong personal
+habit markers. Telling apart polished authors in a shared register —
+or a student paraphrasing *well* — is beyond v1's features. Corpus:
+`samples/gutenberg_*` (Huck Finn, Pride & Prejudice, The Adventures
+of Sherlock Holmes; all public domain).
+
 Try the bundled demo: the genuine homework reads **CONSISTENT**
 (score ~0.8) while the suspect piece reads **WORTH A CONVERSATION**
 (score ~2.0), with the divergent habits listed per feature.
@@ -140,5 +172,6 @@ Two warnings, both serious:
 - [x] Per-classroom calibration helper (`writeprint calibrate`, v1.1)
 - [x] Local browser UI + print-friendly report (`writeprint serve`, v1.2)
 - [x] Two-student validation corpus + CSV batch export (`writeprint batch`, v1.3)
+- [x] Real-prose validation: Gutenberg corpus, honest negative result (v1.4)
 - [ ] Larger validation corpus (real classroom data)
 - [ ] Optional LLM judge for nuanced cases (v1 is fully offline by design)
