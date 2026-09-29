@@ -1,4 +1,4 @@
-"""Local browser UI for Writeprint. Standard library only.
+"""Local browser UI for HonorCode. Standard library only.
 
 Serves a single page on 127.0.0.1: paste baseline samples and a
 submission, get the report rendered with band coloring and a
@@ -20,7 +20,7 @@ PAGE = """<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Writeprint — authorship check</title>
+<title>HonorCode — authorship check</title>
 <style>
   :root { --green: #1a7f37; --amber: #9a6700; --red: #b42318;
           --ink: #1f2328; --muted: #59636e; --line: #d0d7de; --bg: #f6f8fa; }
@@ -73,7 +73,7 @@ PAGE = """<!DOCTYPE html>
 </head>
 <body>
 <header>
-  <h1>✒️ Writeprint</h1>
+  <h1>✒️ HonorCode</h1>
   <p>Authorship verification for the classroom — advisory only, never a verdict.</p>
 </header>
 <main>
@@ -128,7 +128,7 @@ async function check() {
   if (!rows) rows = '<tr><td colspan="4">No strongly divergent habits.</td></tr>';
   const today = new Date().toLocaleDateString();
   rep.innerHTML =
-    "<div><strong>Writeprint report</strong> — " + escapeHtml(student) + " — " + today + "</div>" +
+    "<div><strong>HonorCode report</strong> — " + escapeHtml(student) + " — " + today + "</div>" +
     '<div class="score">' + data.score.toFixed(3) + "</div>" +
     '<span class="band ' + cls + '">' + data.band.toUpperCase() + "</span>" +
     "<table><tr><th>Habit</th><th>Submission</th><th>Baseline avg</th><th>z</th></tr>" +
@@ -171,7 +171,7 @@ def check_payload(payload):
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "Writeprint/1"
+    server_version = "HonorCode/1"
 
     def log_message(self, *args):  # keep the console to startup/errors only
         pass
@@ -225,7 +225,7 @@ class Handler(BaseHTTPRequestHandler):
 def serve(port=DEFAULT_PORT):
     """Serve the UI on 127.0.0.1 only — student text never leaves the machine."""
     server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
-    print("Writeprint UI at http://127.0.0.1:%d  (local only — Ctrl+C to stop)" % port)
+    print("HonorCode UI at http://127.0.0.1:%d  (local only — Ctrl+C to stop)" % port)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

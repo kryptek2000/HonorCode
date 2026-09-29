@@ -1,4 +1,4 @@
-"""Smoke tests for Writeprint v1 (stdlib unittest)."""
+"""Smoke tests for HonorCode v1 (stdlib unittest)."""
 
 import csv
 import os
@@ -8,15 +8,15 @@ import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from writeprint.features import extract, feature_names
-from writeprint.compare import build_baseline, compare
-from writeprint.calibrate import (
+from honorcode.features import extract, feature_names
+from honorcode.compare import build_baseline, compare
+from honorcode.calibrate import (
     loo_genuine_scores,
     suspect_scores,
     sweep,
     recommend,
 )
-from writeprint.export import COLUMNS, rows_for, write_csv
+from honorcode.export import COLUMNS, rows_for, write_csv
 
 SAMPLES = os.path.join(os.path.dirname(__file__), "..", "samples")
 

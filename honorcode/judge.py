@@ -10,9 +10,9 @@ consent, prefer a local model (e.g. Ollama) or your institution's
 endpoint, and never use it as the sole basis for an accusation.
 
 Config (flags override env):
-  WRITEPRINT_JUDGE_URL    chat-completions endpoint URL
-  WRITEPRINT_JUDGE_KEY    bearer token (may be empty for local servers)
-  WRITEPRINT_JUDGE_MODEL  model name
+  HONORCODE_JUDGE_URL    chat-completions endpoint URL
+  HONORCODE_JUDGE_KEY    bearer token (may be empty for local servers)
+  HONORCODE_JUDGE_MODEL  model name
 """
 
 import json
@@ -100,14 +100,14 @@ def parse_response(text):
 
 def judge_config(endpoint=None, api_key=None, model=None):
     """Resolve config from flags-or-env. Raises JudgeError if unusable."""
-    url = endpoint or os.environ.get("WRITEPRINT_JUDGE_URL", "")
-    key = api_key if api_key is not None else os.environ.get("WRITEPRINT_JUDGE_KEY", "")
-    name = model or os.environ.get("WRITEPRINT_JUDGE_MODEL", "")
+    url = endpoint or os.environ.get("HONORCODE_JUDGE_URL", "")
+    key = api_key if api_key is not None else os.environ.get("HONORCODE_JUDGE_KEY", "")
+    name = model or os.environ.get("HONORCODE_JUDGE_MODEL", "")
     missing = [n for n, v in (("endpoint URL", url), ("model", name)) if not v]
     if missing:
         raise JudgeError(
-            "LLM judge not configured (missing %s). Set WRITEPRINT_JUDGE_URL "
-            "and WRITEPRINT_JUDGE_MODEL (plus WRITEPRINT_JUDGE_KEY unless "
+            "LLM judge not configured (missing %s). Set HONORCODE_JUDGE_URL "
+            "and HONORCODE_JUDGE_MODEL (plus HONORCODE_JUDGE_KEY unless "
             "your endpoint needs none), or pass --endpoint/--model. "
             "Any OpenAI-compatible /chat/completions endpoint works, "
             "including a local Ollama server." % " and ".join(missing))
@@ -144,7 +144,7 @@ def call_judge(system, user, endpoint, api_key, model, timeout=60):
 def render_assessment(student, filename, assessment):
     """Render the assessment for the terminal."""
     lines = [
-        "Writeprint LLM assessment (second opinion — advisory only)",
+        "HonorCode LLM assessment (second opinion — advisory only)",
         "  Student:    %s" % student,
         "  Submission: %s" % filename,
         "  Reading:    %s (confidence %.2f)" % (

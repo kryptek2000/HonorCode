@@ -9,9 +9,9 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from writeprint.compare import build_baseline
-from writeprint.features import extract
-from writeprint.judge import (JudgeError, build_prompt, call_judge,
+from honorcode.compare import build_baseline
+from honorcode.features import extract
+from honorcode.judge import (JudgeError, build_prompt, call_judge,
                               judge_config, parse_response)
 
 SAMPLES = os.path.join(os.path.dirname(__file__), "..", "samples")
@@ -79,14 +79,14 @@ class TestParse(unittest.TestCase):
 
 class TestConfig(unittest.TestCase):
     def test_missing_config_raises_helpfully(self):
-        env = {"WRITEPRINT_JUDGE_URL": "", "WRITEPRINT_JUDGE_MODEL": ""}
+        env = {"HONORCODE_JUDGE_URL": "", "HONORCODE_JUDGE_MODEL": ""}
         old = {k: os.environ.get(k) for k in env}
         try:
             os.environ.update(env)
-            os.environ.pop("WRITEPRINT_JUDGE_KEY", None)
+            os.environ.pop("HONORCODE_JUDGE_KEY", None)
             with self.assertRaises(JudgeError) as ctx:
                 judge_config()
-            self.assertIn("WRITEPRINT_JUDGE_URL", str(ctx.exception))
+            self.assertIn("HONORCODE_JUDGE_URL", str(ctx.exception))
         finally:
             for k, v in old.items():
                 if v is None:
