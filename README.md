@@ -57,6 +57,30 @@ python -m writeprint.cli batch baselines/student_a.json \
 One row per submission — student, file, score, band, flag count, top
 divergent habits — ready for gradebook-adjacent workflows.
 
+## LLM judge (opt-in second opinion, v1.6)
+
+For the nuanced middle (`mild divergence`), an optional LLM pass can
+weigh the habits in prose. Offline-first: it does nothing unless you
+configure it.
+
+```bash
+export WRITEPRINT_JUDGE_URL=https://your-endpoint/v1/chat/completions
+export WRITEPRINT_JUDGE_MODEL=your-model
+export WRITEPRINT_JUDGE_KEY=...   # omit for local servers like Ollama
+python -m writeprint.cli judge baselines/student_a.json submission.txt
+```
+
+Any OpenAI-compatible endpoint works, including a fully local Ollama
+server. Three rules, enforced by design:
+
+1. **It can only advise.** Output is consistency + confidence + reasons,
+   always labeled advisory; unparseable replies degrade to `uncertain`,
+   never to a false verdict.
+2. **Student text leaves the machine only if you say so.** No endpoint,
+   no call. Prefer local models; get consent otherwise.
+3. **Statistics + teacher outrank it.** The last line of every
+   assessment says so.
+
 ## Validation: baselines are student-specific
 
 The bundled two-student corpus proves the point of the tool. Scored
@@ -204,5 +228,5 @@ Two warnings, both serious:
 - [x] Two-student validation corpus + CSV batch export (`writeprint batch`, v1.3)
 - [x] Real-prose validation: Gutenberg corpus, honest negative result (v1.4)
 - [x] Real student writing: ASAP false-flag study, published rates (v1.5)
+- [x] Opt-in LLM judge for nuanced cases, offline by default (v1.6)
 - [ ] Classroom pilot: multi-sample baselines from live student work
-- [ ] Optional LLM judge for nuanced cases (v1 is fully offline by design)
