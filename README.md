@@ -46,6 +46,32 @@ parent/teacher conferences (just hit *Print report*). The server binds
 to localhost only, ships zero external assets, and makes zero network
 calls: student text never leaves the machine.
 
+## Batch scoring to CSV
+
+```bash
+python -m writeprint.cli batch baselines/student_a.json \
+    homework1.txt homework2.txt homework3.txt \
+    -o results.csv [--thresholds baselines/student_a.thresholds.json]
+```
+
+One row per submission — student, file, score, band, flag count, top
+divergent habits — ready for gradebook-adjacent workflows.
+
+## Validation: baselines are student-specific
+
+The bundled two-student corpus proves the point of the tool. Scored
+with default bands:
+
+| Baseline ↓ / Submission → | A's genuine | B's genuine | A's suspect |
+|---|---|---|---|
+| **A's baseline** | 0.83 consistent | 1.59 conversation | 2.01 conversation |
+| **B's baseline** | 1.88 conversation | 0.47 consistent | 1.72 conversation |
+
+Own work passes; anyone else's — even genuine homework by a real
+classmate on the same assignment — gets flagged. A shared cheat sheet
+or one student's essay submitted under another name lights up both
+baselines. (Scores from the bundled toy corpus; re-run on real data.)
+
 Try the bundled demo: the genuine homework reads **CONSISTENT**
 (score ~0.8) while the suspect piece reads **WORTH A CONVERSATION**
 (score ~2.0), with the divergent habits listed per feature.
@@ -113,6 +139,6 @@ Two warnings, both serious:
 
 - [x] Per-classroom calibration helper (`writeprint calibrate`, v1.1)
 - [x] Local browser UI + print-friendly report (`writeprint serve`, v1.2)
-- [ ] More baselines + larger validation corpus
+- [x] Two-student validation corpus + CSV batch export (`writeprint batch`, v1.3)
+- [ ] Larger validation corpus (real classroom data)
 - [ ] Optional LLM judge for nuanced cases (v1 is fully offline by design)
-- [ ] CSV export for gradebook-adjacent workflows

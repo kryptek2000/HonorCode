@@ -15,6 +15,7 @@ from .calibrate import (
     render_table,
 )
 from .web import DEFAULT_PORT, serve
+from .export import rows_for, write_csv
 
 
 def cmd_build(args):
@@ -46,6 +47,22 @@ def cmd_check(args):
 
 def cmd_serve(args):
     serve(args.port)
+
+
+def cmd_batch(args):
+    with open(args.baseline, encoding="utf-8") as fh:
+        baseline = json.load(fh)
+    bands = None
+    if args.thresholds:
+        with open(args.thresholds, encoding="utf-8") as fh:
+            cfg = json.load(fh)
+        bands = (BAND_CONSISTENT, cfg["flag_threshold"])
+    submissions = []
+    for path in args.submissions:
+        with open(path, encoding="utf-8") as fh:
+            submissions.append((path, fh.read()))
+    n = write_csv(rows_for(baseline, submissions, bands=bands), args.out)
+    print("Wrote %d rows to %s" % (n, args.out))
 
 
 def cmd_calibrate(args):
@@ -112,6 +129,14 @@ def main(argv=None):
     p_serve.add_argument("--port", type=int, default=DEFAULT_PORT,
                          help="Local port (default %d)." % DEFAULT_PORT)
     p_serve.set_defaults(func=cmd_serve)
+
+    p_batch = sub.add_parser("batch", help="Score many submissions to a CSV file.")
+    p_batch.add_argument("baseline", help="Baseline JSON from 'build'.")
+    p_batch.add_argument("submissions", nargs="+", help="Submission text files.")
+    p_batch.add_argument("-o", "--out", required=True, help="Where to write the CSV.")
+    p_batch.add_argument("--thresholds", default=None,
+                         help="Thresholds JSON from 'calibrate --out'.")
+    p_batch.set_defaults(func=cmd_batch)
 
     args = parser.parse_args(argv)
     args.func(args)
