@@ -1,0 +1,60 @@
+# Writeprint CI: unit tests + end-to-end CLI smoke test on every push/PR.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Run test suite
+        run: python -m unittest discover -s tests -v
+
+  demo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: CLI smoke test (build, check, calibrate, batch, serve)
+        run: |
+          set -euo pipefail
+          python -m writeprint.cli build \
+            samples/student_a_baseline1.txt \
+            samples/student_a_baseline2.txt \
+            samples/student_a_baseline3.txt \
+            -o /tmp/base.json --student student_a
+          python -m writeprint.cli check /tmp/base.json \
+            samples/student_a_homework_genuine.txt | grep -q CONSISTENT
+          python -m writeprint.cli check /tmp/base.json \
+            samples/student_a_homework_suspect.txt | grep -q CONVERSATION
+          python -m writeprint.cli calibrate \
+            --samples samples/student_a_baseline1.txt \
+                      samples/student_a_baseline2.txt \
+                      samples/student_a_baseline3.txt \
+            --suspect samples/student_a_homework_suspect.txt \
+            --student student_a -o /tmp/thresholds.json
+          python -m writeprint.cli batch /tmp/base.json \
+            samples/student_a_homework_genuine.txt \
+            samples/student_a_homework_suspect.txt \
+            -o /tmp/results.csv --thresholds /tmp/thresholds.json
+          test "$(wc -l < /tmp/results.csv)" = "3"
+          (python -m writeprint.cli serve --port 8765 &>/tmp/serve.log & echo $! > /tmp/serve.pid)
+          for i in $(seq 1 20); do
+            curl -sf http://127.0.0.1:8765/ -o /dev/null && break
+            sleep 1
+          done
+          curl -sf http://127.0.0.1:8765/ | grep -q Writeprint
+          kill "$(cat /tmp/serve.pid)"
