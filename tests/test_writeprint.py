@@ -1,7 +1,9 @@
 """Smoke tests for Writeprint v1 (stdlib unittest)."""
 
+import csv
 import os
 import sys
+import tempfile
 import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -14,6 +16,7 @@ from writeprint.calibrate import (
     sweep,
     recommend,
 )
+from writeprint.export import COLUMNS, rows_for, write_csv
 
 SAMPLES = os.path.join(os.path.dirname(__file__), "..", "samples")
 
@@ -90,6 +93,76 @@ class TestCalibration(unittest.TestCase):
         self.assertEqual(best["f1"], 1.0)
         self.assertGreater(best["threshold"], max(genuine))
         self.assertLessEqual(best["threshold"], min(suspect))
+
+
+def student_baseline(letter):
+    texts = [read("student_%s_baseline%d.txt" % (letter, i)) for i in (1, 2, 3)]
+    profile = build_baseline([extract(t) for t in texts])
+    profile["student"] = "student_%s" % letter
+    return profile
+
+
+class TestSpecificity(unittest.TestCase):
+    """Baselines must be student-specific: another student's genuine
+    work must NOT pass as your own."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.base_a = student_baseline("a")
+        cls.base_b = student_baseline("b")
+
+    def band(self, baseline, sample):
+        return compare(extract(read(sample)), baseline)["band"]
+
+    def test_own_work_passes(self):
+        self.assertEqual(
+            self.band(self.base_a, "student_a_homework_genuine.txt"), "consistent")
+        self.assertEqual(
+            self.band(self.base_b, "student_b_homework_genuine.txt"), "consistent")
+
+    def test_other_students_work_flagged(self):
+        self.assertNotEqual(
+            self.band(self.base_a, "student_b_homework_genuine.txt"), "consistent")
+        self.assertNotEqual(
+            self.band(self.base_b, "student_a_homework_genuine.txt"), "consistent")
+
+    def test_suspect_flagged_under_both(self):
+        self.assertEqual(
+            self.band(self.base_a, "student_a_homework_suspect.txt"),
+            "worth a conversation")
+        self.assertEqual(
+            self.band(self.base_b, "student_a_homework_suspect.txt"),
+            "worth a conversation")
+
+
+class TestExport(unittest.TestCase):
+    def test_rows_for_bundled_samples(self):
+        baseline = student_baseline("a")
+        rows = rows_for(baseline, [
+            ("genuine.txt", read("student_a_homework_genuine.txt")),
+            ("suspect.txt", read("student_a_homework_suspect.txt")),
+        ])
+        self.assertEqual([r["band"] for r in rows],
+                         ["consistent", "worth a conversation"])
+        self.assertEqual(rows[0]["student"], "student_a")
+        self.assertTrue(float(rows[1]["score"]) > float(rows[0]["score"]))
+
+    def test_write_csv_roundtrip(self):
+        baseline = student_baseline("a")
+        rows = rows_for(baseline, [
+            ("genuine.txt", read("student_a_homework_genuine.txt")),
+        ])
+        with tempfile.NamedTemporaryFile("r", suffix=".csv",
+                                         delete=False) as tmp:
+            path = tmp.name
+        try:
+            self.assertEqual(write_csv(rows, path), 1)
+            with open(path, encoding="utf-8", newline="") as fh:
+                back = list(csv.DictReader(fh))
+            self.assertEqual(back[0]["band"], "consistent")
+            self.assertEqual(set(back[0].keys()), set(COLUMNS))
+        finally:
+            os.unlink(path)
 
 
 if __name__ == "__main__":

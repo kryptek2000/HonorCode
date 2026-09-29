@@ -1,0 +1,134 @@
+{
+  "features": {
+    "avg_sentence_len": {
+      "mean": 4.553058053058053,
+      "std": 1.1882645132645133
+    },
+    "avg_word_len": {
+      "mean": 4.012045939083449,
+      "std": 1.0530114847708623
+    },
+    "type_token_ratio": {
+      "mean": 0.7070197364810681,
+      "std": 0.22675493412026704
+    },
+    "long_word_ratio": {
+      "mean": 0.12722084831404648,
+      "std": 0.08180521207851163
+    },
+    "first_person_per_100": {
+      "mean": 5.69615248669512,
+      "std": 3.6865370406793607
+    },
+    "contractions_per_100": {
+      "mean": 0.0,
+      "std": 0.05
+    },
+    "commas_per_100": {
+      "mean": 0.0,
+      "std": 0.05
+    },
+    "semicolons_per_100": {
+      "mean": 0.0,
+      "std": 0.05
+    },
+    "colons_per_100": {
+      "mean": 0.0,
+      "std": 0.05
+    },
+    "exclaim_per_100": {
+      "mean": 0.6846429323783442,
+      "std": 0.48505052350124483
+    },
+    "question_per_100": {
+      "mean": 0.0,
+      "std": 0.05
+    },
+    "paragraphs": {
+      "mean": 2.3333333333333335,
+      "std": 0.6333333333333334
+    },
+    "fw_the_per_100": {
+      "mean": 4.139899060530047,
+      "std": 2.036646434176513
+    },
+    "fw_and_per_100": {
+      "mean": 0.33003300330033003,
+      "std": 0.4667371492980512
+    },
+    "fw_but_per_100": {
+      "mean": 0.0,
+      "std": 0.05
+    },
+    "fw_however_per_100": {
+      "mean": 0.0,
+      "std": 0.05
+    },
+    "fw_therefore_per_100": {
+      "mean": 0.0,
+      "std": 0.05
+    },
+    "fw_because_per_100": {
+      "mean": 0.0,
+      "std": 0.05
+    },
+    "fw_so_per_100": {
+      "mean": 0.33003300330033003,
+      "std": 0.4667371492980512
+    },
+    "fw_very_per_100": {
+      "mean": 1.2947879804966014,
+      "std": 0.4931717379667497
+    },
+    "fw_really_per_100": {
+      "mean": 0.0,
+      "std": 0.05
+    },
+    "fw_just_per_100": {
+      "mean": 0.0,
+      "std": 0.05
+    },
+    "fw_also_per_100": {
+      "mean": 0.0,
+      "std": 0.05
+    },
+    "fw_although_per_100": {
+      "mean": 0.0,
+      "std": 0.05
+    },
+    "fw_while_per_100": {
+      "mean": 0.0,
+      "std": 0.05
+    },
+    "fw_since_per_100": {
+      "mean": 0.0,
+      "std": 0.05
+    },
+    "fw_thus_per_100": {
+      "mean": 0.0,
+      "std": 0.05
+    },
+    "fw_moreover_per_100": {
+      "mean": 0.0,
+      "std": 0.05
+    },
+    "fw_furthermore_per_100": {
+      "mean": 0.0,
+      "std": 0.05
+    },
+    "fw_in_per_100": {
+      "mean": 0.9401780514185872,
+      "std": 0.8114893121885325
+    },
+    "fw_of_per_100": {
+      "mean": 0.2801120448179272,
+      "std": 0.39613825276557285
+    },
+    "fw_to_per_100": {
+      "mean": 0.9893319029739556,
+      "std": 0.8749794742293925
+    }
+  },
+  "n_samples": 3,
+  "student": "student_b"
+}
