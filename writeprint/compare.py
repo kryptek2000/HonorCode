@@ -31,12 +31,15 @@ def build_baseline(feature_dicts):
     return {"features": profile, "n_samples": len(feature_dicts)}
 
 
-def compare(features, baseline, eps=1e-9):
+def compare(features, baseline, bands=None, eps=1e-9):
     """Compare a submission against a baseline profile.
 
-    Returns {"score": mean |z|, "band": ..., "flags": [...]} where flags
-    are per-feature divergences with |z| >= 2, sorted worst first.
-    """
+    bands overrides (BAND_CONSISTENT, BAND_REVIEW), e.g. with values
+    from `writeprint calibrate --out`. Returns {"score": mean |z| (full precision — round only for display),
+ "band": ..., "flags": [...]} where flags are per-feature
+ divergences with |z| >= 2, sorted worst first.
+ """
+    consistent_band, review_band = bands or (BAND_CONSISTENT, BAND_REVIEW)
     prof = baseline["features"]
     scored = {}
     for name, stats in prof.items():
@@ -44,9 +47,9 @@ def compare(features, baseline, eps=1e-9):
         # Cap: no single habit may dominate the overall score.
         scored[name] = min(z, 5.0)
     score = sum(scored.values()) / len(scored) if scored else 0.0
-    if score < BAND_CONSISTENT:
+    if score < consistent_band:
         band = "consistent"
-    elif score < BAND_REVIEW:
+    elif score < review_band:
         band = "mild divergence"
     else:
         band = "worth a conversation"
@@ -60,7 +63,7 @@ def compare(features, baseline, eps=1e-9):
         for name, z in sorted(scored.items(), key=lambda kv: kv[1], reverse=True)
         if z >= 2.0
     ]
-    return {"score": round(score, 3), "band": band, "flags": flags}
+    return {"score": score, "band": band, "flags": flags}
 
 
 def render_report(student, filename, result):
@@ -69,7 +72,7 @@ def render_report(student, filename, result):
         "Writeprint report",
         "  Student:    %s" % student,
         "  Submission: %s" % filename,
-        "  Score:      %s (mean |z| vs. baseline)" % result["score"],
+        "  Score:      %.3f (mean |z| vs. baseline)" % result["score"],
         "  Reading:    %s" % result["band"].upper(),
         "",
     ]

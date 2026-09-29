@@ -41,6 +41,36 @@ Try the bundled demo: the genuine homework reads **CONSISTENT**
 python -m unittest discover -s tests   # smoke tests + demo expectations
 ```
 
+## Calibrating thresholds (do this on real data)
+
+The built-in bands are tuned on toy samples. For classroom use, calibrate
+on your own labeled set — genuine pieces plus known-suspect ones:
+
+```bash
+# Leave-one-out scores each genuine sample against the others,
+# sweeps candidate thresholds, and recommends one (max F1,
+# ties break toward fewer false flags).
+python -m writeprint.cli calibrate \
+    --samples genuine1.txt genuine2.txt genuine3.txt \
+    --suspect suspect1.txt \
+    --student student_a -o baselines/student_a.thresholds.json
+
+# Use the calibrated threshold when checking
+python -m writeprint.cli check baselines/student_a.json submission.txt \
+    --thresholds baselines/student_a.thresholds.json
+```
+
+Two warnings, both serious:
+
+1. **Sample size.** The math needs dozens of labeled pieces per class to
+   mean anything. With a handful of samples the "recommended" threshold is
+   a knife-edge fit to your tiny dataset — better than a guess, but only
+   just. Collect broadly before trusting it.
+2. **Full precision internally, rounded for display.** Scores are computed
+   at full float precision and only rounded when printed, so a report
+   showing `2.007` against a threshold of `2.007` can still read either
+   side of the line. The band is always computed on the unrounded value.
+
 ## How it works
 
 1. **Extract** (`writeprint/features.py`) — 33 stylometric features per text:
@@ -68,7 +98,8 @@ python -m unittest discover -s tests   # smoke tests + demo expectations
 
 ## Roadmap
 
-- [ ] More baselines + per-classroom calibration helper
+- [x] Per-classroom calibration helper (`writeprint calibrate`, v1.1)
+- [ ] More baselines + larger validation corpus
 - [ ] HTML report for parent/teacher conferences
 - [ ] Optional LLM judge for nuanced cases (v1 is fully offline by design)
 - [ ] CSV export for gradebook-adjacent workflows

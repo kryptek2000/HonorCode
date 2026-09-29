@@ -6,7 +6,14 @@ import os
 import sys
 
 from .features import extract
-from .compare import build_baseline, compare, render_report
+from .compare import BAND_CONSISTENT, build_baseline, compare, render_report
+from .calibrate import (
+    loo_genuine_scores,
+    suspect_scores,
+    sweep,
+    recommend,
+    render_table,
+)
 
 
 def cmd_build(args):
@@ -27,8 +34,46 @@ def cmd_check(args):
         baseline = json.load(fh)
     with open(args.submission, encoding="utf-8") as fh:
         text = fh.read()
-    result = compare(extract(text), baseline)
+    bands = None
+    if args.thresholds:
+        with open(args.thresholds, encoding="utf-8") as fh:
+            cfg = json.load(fh)
+        bands = (BAND_CONSISTENT, cfg["flag_threshold"])
+    result = compare(extract(text), baseline, bands=bands)
     print(render_report(baseline.get("student", "?"), args.submission, result))
+
+
+def cmd_calibrate(args):
+    def read_many(paths):
+        texts = []
+        for path in paths:
+            with open(path, encoding="utf-8") as fh:
+                texts.append(fh.read())
+        return texts
+
+    genuine_texts = read_many(args.samples)
+    suspect_texts = read_many(args.suspect)
+    genuine = loo_genuine_scores(genuine_texts)
+    full_baseline = build_baseline([extract(t) for t in genuine_texts])
+    suspect = suspect_scores(suspect_texts, full_baseline)
+    labeled = [(s, False) for s in genuine] + [(s, True) for s in suspect]
+    rows = sweep(labeled)
+    best = recommend(rows)
+    print("Calibration for '%s' (%d genuine via leave-one-out, %d suspect)"
+          % (args.student, len(genuine), len(suspect)))
+    print(render_table(rows, best))
+    if args.out:
+        with open(args.out, "w", encoding="utf-8") as fh:
+            json.dump({
+                "student": args.student,
+                "flag_threshold": best["threshold"],
+                "precision": best["precision"],
+                "recall": best["recall"],
+                "f1": best["f1"],
+                "n_genuine": len(genuine),
+                "n_suspect": len(suspect),
+            }, fh, indent=2)
+        print("Thresholds written to %s" % args.out)
 
 
 def main(argv=None):
@@ -44,7 +89,19 @@ def main(argv=None):
     p_check = sub.add_parser("check", help="Check a submission against a baseline.")
     p_check.add_argument("baseline", help="Baseline JSON from 'build'.")
     p_check.add_argument("submission", help="Submission text file to check.")
+    p_check.add_argument("--thresholds", default=None,
+                         help="Thresholds JSON from 'calibrate --out' (overrides the review band).")
     p_check.set_defaults(func=cmd_check)
+
+    p_cal = sub.add_parser("calibrate", help="Calibrate the flag threshold on labeled data.")
+    p_cal.add_argument("--samples", nargs="+", required=True,
+                       help="3+ known-genuine sample files (leave-one-out gives genuine scores).")
+    p_cal.add_argument("--suspect", nargs="+", required=True,
+                       help="Known-suspect sample files.")
+    p_cal.add_argument("--student", required=True, help="Student label for the report.")
+    p_cal.add_argument("-o", "--out", default=None,
+                       help="Write recommended thresholds JSON for 'check --thresholds'.")
+    p_cal.set_defaults(func=cmd_calibrate)
 
     args = parser.parse_args(argv)
     args.func(args)
