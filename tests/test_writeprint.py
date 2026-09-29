@@ -165,5 +165,37 @@ class TestExport(unittest.TestCase):
             os.unlink(path)
 
 
+GUTENBERG_AUTHORS = ("twain", "austen", "doyle")
+
+
+def gutenberg_baseline(author):
+    texts = [read("gutenberg_%s_%s.txt" % (author, kind))
+             for kind in ("baseline1", "baseline2", "baseline3")]
+    profile = build_baseline([extract(t) for t in texts])
+    profile["student"] = author
+    return profile
+
+
+class TestGutenberg(unittest.TestCase):
+    """Real-world prose (Project Gutenberg, public domain).
+
+    Within-author stability holds: a held-out passage by the same
+    author reads consistent against their baseline. Cross-author
+    separation does NOT hold for long-form literary prose in a shared
+    formal register — documented in the README, not hidden.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.baselines = {a: gutenberg_baseline(a) for a in GUTENBERG_AUTHORS}
+
+    def test_own_heldout_reads_consistent(self):
+        for author in GUTENBERG_AUTHORS:
+            with self.subTest(author=author):
+                heldout = read("gutenberg_%s_heldout.txt" % author)
+                result = compare(extract(heldout), self.baselines[author])
+                self.assertEqual(result["band"], "consistent", msg=result)
+
+
 if __name__ == "__main__":
     unittest.main()
