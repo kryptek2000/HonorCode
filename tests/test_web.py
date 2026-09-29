@@ -73,6 +73,7 @@ class TestHttpServer(unittest.TestCase):
     def tearDownClass(cls):
         cls.server.shutdown()
         cls.thread.join()
+        cls.server.server_close()
 
     def request(self, method, path, body=None):
         conn = HTTPConnection("127.0.0.1", self.port, timeout=10)

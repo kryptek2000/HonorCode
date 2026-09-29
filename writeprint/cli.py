@@ -16,6 +16,8 @@ from .calibrate import (
 )
 from .web import DEFAULT_PORT, serve
 from .export import rows_for, write_csv
+from .judge import (JudgeError, build_prompt, call_judge, judge_config,
+                    render_assessment)
 
 
 def cmd_build(args):
@@ -47,6 +49,24 @@ def cmd_check(args):
 
 def cmd_serve(args):
     serve(args.port)
+
+
+def cmd_judge(args):
+    with open(args.baseline, encoding="utf-8") as fh:
+        baseline = json.load(fh)
+    with open(args.submission, encoding="utf-8") as fh:
+        text = fh.read()
+    try:
+        endpoint, api_key, model = judge_config(
+            args.endpoint, args.key, args.model)
+        system, user = build_prompt(
+            baseline, text, baseline.get("student", "?"))
+        assessment = call_judge(system, user, endpoint, api_key, model)
+    except JudgeError as exc:
+        print("writeprint judge: %s" % exc)
+        raise SystemExit(2)
+    print(render_assessment(baseline.get("student", "?"),
+                            args.submission, assessment))
 
 
 def cmd_batch(args):
@@ -137,6 +157,17 @@ def main(argv=None):
     p_batch.add_argument("--thresholds", default=None,
                          help="Thresholds JSON from 'calibrate --out'.")
     p_batch.set_defaults(func=cmd_batch)
+
+    p_judge = sub.add_parser("judge", help="Ask an LLM for a second opinion (opt-in).")
+    p_judge.add_argument("baseline", help="Baseline JSON from 'build'.")
+    p_judge.add_argument("submission", help="Submission text file to assess.")
+    p_judge.add_argument("--endpoint", default=None,
+                         help="Chat-completions URL (or WRITEPRINT_JUDGE_URL).")
+    p_judge.add_argument("--key", default=None,
+                         help="Bearer token (or WRITEPRINT_JUDGE_KEY).")
+    p_judge.add_argument("--model", default=None,
+                         help="Model name (or WRITEPRINT_JUDGE_MODEL).")
+    p_judge.set_defaults(func=cmd_judge)
 
     args = parser.parse_args(argv)
     args.func(args)
