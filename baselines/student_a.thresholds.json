@@ -1,0 +1,9 @@
+{
+  "student": "student_a",
+  "flag_threshold": 2.0066794592510293,
+  "precision": 1.0,
+  "recall": 1.0,
+  "f1": 1.0,
+  "n_genuine": 3,
+  "n_suspect": 1
+}
