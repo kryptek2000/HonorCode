@@ -1,4 +1,4 @@
-"""Tests for the Writeprint browser UI (stdlib only)."""
+"""Tests for the HonorCode browser UI (stdlib only)."""
 
 import json
 import os
@@ -10,7 +10,7 @@ from http.server import ThreadingHTTPServer
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from writeprint.web import Handler, check_payload
+from honorcode.web import Handler, check_payload
 
 SAMPLES = os.path.join(os.path.dirname(__file__), "..", "samples")
 
@@ -92,7 +92,7 @@ class TestHttpServer(unittest.TestCase):
         status, ctype, raw = self.request("GET", "/")
         self.assertEqual(status, 200)
         self.assertIn("text/html", ctype)
-        self.assertIn(b"Writeprint", raw)
+        self.assertIn(b"HonorCode", raw)
         self.assertIn(b"/api/check", raw)
 
     def test_api_check_roundtrip(self):

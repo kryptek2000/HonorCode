@@ -1,8 +1,8 @@
-# Writeprint
+# HonorCode
 
 **Authorship verification for the classroom — not an AI detector.**
 
-Writeprint compares a student's submission against that student's *own*
+HonorCode compares a student's submission against that student's *own*
 known-genuine writing and reports how far their writing habits diverge.
 The output is a reading — *consistent*, *mild divergence*, or
 *worth a conversation* — never a verdict. A human teacher always decides
@@ -16,27 +16,27 @@ evasion via paraphrasing. Accusing a student on that basis is unjust.
 
 Asking "was this written by *this student*?" is a far more tractable
 question. Individual writing habits — sentence length, favorite transitions,
-punctuation, contractions, function-word rates — form a *writeprint* that is
-stable per author and hard to fake wholesale. Writeprint measures divergence
+punctuation, contractions, function-word rates — form a writing
+fingerprint that is stable per author and hard to fake wholesale. HonorCode measures divergence
 from that baseline.
 
 ## Quickstart (no dependencies, Python 3.8+)
 
 ```bash
 # 1. Build a baseline from 2+ samples of known-genuine writing
-python -m writeprint.cli build samples/student_a_baseline1.txt \
+python -m honorcode.cli build samples/student_a_baseline1.txt \
     samples/student_a_baseline2.txt \
     -o baselines/student_a.json --student student_a
 
 # 2. Check a submission
-python -m writeprint.cli check baselines/student_a.json \
+python -m honorcode.cli check baselines/student_a.json \
     samples/student_a_homework_genuine.txt
 ```
 
 ## Browser UI (no dependencies, runs offline)
 
 ```bash
-python -m writeprint.cli serve
+python -m honorcode.cli serve
 # → open http://127.0.0.1:8765
 ```
 
@@ -49,7 +49,7 @@ calls: student text never leaves the machine.
 ## Batch scoring to CSV
 
 ```bash
-python -m writeprint.cli batch baselines/student_a.json \
+python -m honorcode.cli batch baselines/student_a.json \
     homework1.txt homework2.txt homework3.txt \
     -o results.csv [--thresholds baselines/student_a.thresholds.json]
 ```
@@ -64,10 +64,10 @@ weigh the habits in prose. Offline-first: it does nothing unless you
 configure it.
 
 ```bash
-export WRITEPRINT_JUDGE_URL=https://your-endpoint/v1/chat/completions
-export WRITEPRINT_JUDGE_MODEL=your-model
-export WRITEPRINT_JUDGE_KEY=...   # omit for local servers like Ollama
-python -m writeprint.cli judge baselines/student_a.json submission.txt
+export HONORCODE_JUDGE_URL=https://your-endpoint/v1/chat/completions
+export HONORCODE_JUDGE_MODEL=your-model
+export HONORCODE_JUDGE_KEY=...   # omit for local servers like Ollama
+python -m honorcode.cli judge baselines/student_a.json submission.txt
 ```
 
 Any OpenAI-compatible endpoint works, including a fully local Ollama
@@ -122,7 +122,7 @@ Two findings:
    (Twain/Doyle quote heavily, Austen doesn't) proved scene-dependent
    rather than author-stable, so it was left out.
 
-Honest scope: Writeprint distinguishes voices with strong personal
+Honest scope: HonorCode distinguishes voices with strong personal
 habit markers. Telling apart polished authors in a shared register —
 or a student paraphrasing *well* — is beyond v1's features. Corpus:
 `samples/gutenberg_*` (Huck Finn, Pride & Prejudice, The Adventures
@@ -175,13 +175,13 @@ on your own labeled set — genuine pieces plus known-suspect ones:
 # Leave-one-out scores each genuine sample against the others,
 # sweeps candidate thresholds, and recommends one (max F1,
 # ties break toward fewer false flags).
-python -m writeprint.cli calibrate \
+python -m honorcode.cli calibrate \
     --samples genuine1.txt genuine2.txt genuine3.txt \
     --suspect suspect1.txt \
     --student student_a -o baselines/student_a.thresholds.json
 
 # Use the calibrated threshold when checking
-python -m writeprint.cli check baselines/student_a.json submission.txt \
+python -m honorcode.cli check baselines/student_a.json submission.txt \
     --thresholds baselines/student_a.thresholds.json
 ```
 
@@ -198,11 +198,11 @@ Two warnings, both serious:
 
 ## How it works
 
-1. **Extract** (`writeprint/features.py`) — 33 stylometric features per text:
+1. **Extract** (`honorcode/features.py`) — 33 stylometric features per text:
    sentence/word length, type-token ratio, long-word ratio, first-person and
    contraction rates, punctuation rates, and 20 function-word rates.
    All rates are per-100-words so texts of different lengths compare fairly.
-2. **Baseline** (`writeprint/compare.py`) — per-feature mean/std across the
+2. **Baseline** (`honorcode/compare.py`) — per-feature mean/std across the
    student's samples, with a variance floor so rare habits can't produce
    explosive z-scores from sparse data.
 3. **Compare** — mean absolute z-score across features, with per-feature
@@ -223,9 +223,9 @@ Two warnings, both serious:
 
 ## Roadmap
 
-- [x] Per-classroom calibration helper (`writeprint calibrate`, v1.1)
-- [x] Local browser UI + print-friendly report (`writeprint serve`, v1.2)
-- [x] Two-student validation corpus + CSV batch export (`writeprint batch`, v1.3)
+- [x] Per-classroom calibration helper (`honorcode calibrate`, v1.1)
+- [x] Local browser UI + print-friendly report (`honorcode serve`, v1.2)
+- [x] Two-student validation corpus + CSV batch export (`honorcode batch`, v1.3)
 - [x] Real-prose validation: Gutenberg corpus, honest negative result (v1.4)
 - [x] Real student writing: ASAP false-flag study, published rates (v1.5)
 - [x] Opt-in LLM judge for nuanced cases, offline by default (v1.6)

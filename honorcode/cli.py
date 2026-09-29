@@ -1,4 +1,4 @@
-"""Writeprint command line: build baselines, check submissions."""
+"""HonorCode command line: build baselines, check submissions."""
 
 import argparse
 import json
@@ -63,7 +63,7 @@ def cmd_judge(args):
             baseline, text, baseline.get("student", "?"))
         assessment = call_judge(system, user, endpoint, api_key, model)
     except JudgeError as exc:
-        print("writeprint judge: %s" % exc)
+        print("honorcode judge: %s" % exc)
         raise SystemExit(2)
     print(render_assessment(baseline.get("student", "?"),
                             args.submission, assessment))
@@ -119,7 +119,7 @@ def cmd_calibrate(args):
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(prog="writeprint", description="Authorship verification for the classroom.")
+    parser = argparse.ArgumentParser(prog="honorcode", description="Authorship verification for the classroom.")
     sub = parser.add_subparsers(dest="cmd", required=True)
 
     p_build = sub.add_parser("build", help="Build a baseline from known-genuine samples.")
@@ -162,11 +162,11 @@ def main(argv=None):
     p_judge.add_argument("baseline", help="Baseline JSON from 'build'.")
     p_judge.add_argument("submission", help="Submission text file to assess.")
     p_judge.add_argument("--endpoint", default=None,
-                         help="Chat-completions URL (or WRITEPRINT_JUDGE_URL).")
+                         help="Chat-completions URL (or HONORCODE_JUDGE_URL).")
     p_judge.add_argument("--key", default=None,
-                         help="Bearer token (or WRITEPRINT_JUDGE_KEY).")
+                         help="Bearer token (or HONORCODE_JUDGE_KEY).")
     p_judge.add_argument("--model", default=None,
-                         help="Model name (or WRITEPRINT_JUDGE_MODEL).")
+                         help="Model name (or HONORCODE_JUDGE_MODEL).")
     p_judge.set_defaults(func=cmd_judge)
 
     args = parser.parse_args(argv)

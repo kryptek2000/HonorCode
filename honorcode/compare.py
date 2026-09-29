@@ -35,7 +35,7 @@ def compare(features, baseline, bands=None, eps=1e-9):
     """Compare a submission against a baseline profile.
 
     bands overrides (BAND_CONSISTENT, BAND_REVIEW), e.g. with values
-    from `writeprint calibrate --out`. Returns {"score": mean |z| (full precision — round only for display),
+    from `honorcode calibrate --out`. Returns {"score": mean |z| (full precision — round only for display),
  "band": ..., "flags": [...]} where flags are per-feature
  divergences with |z| >= 2, sorted worst first.
  """
@@ -69,7 +69,7 @@ def compare(features, baseline, bands=None, eps=1e-9):
 def render_report(student, filename, result):
     """Render a teacher-readable report (advisory, never a verdict)."""
     lines = [
-        "Writeprint report",
+        "HonorCode report",
         "  Student:    %s" % student,
         "  Submission: %s" % filename,
         "  Score:      %.3f (mean |z| vs. baseline)" % result["score"],
