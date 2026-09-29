@@ -104,6 +104,36 @@ or a student paraphrasing *well* — is beyond v1's features. Corpus:
 `samples/gutenberg_*` (Huck Finn, Pride & Prejudice, The Adventures
 of Sherlock Holmes; all public domain).
 
+## Validation on real student writing (ASAP)
+
+Literature was step one; real classroom writing is step two. The
+Hewlett Foundation's ASAP set 1 — ~1,700 de-identified persuasive
+letters by US students in grades 7–10 — studied 300 essays at default
+bands. One essay per student, so each essay was split into thirds
+(leave-one-out within, cross-student across, same prompt throughout):
+
+| Check (n) | Consistent | Mild | Review | Mean score |
+|---|---|---|---|---|
+| Within-essay thirds (900) | 856 (95.1%) | 41 | 3 | 0.815 |
+| Cross-student, same prompt (300) | 266 (88.7%) | 28 | 6 | 0.924 |
+
+What this means, plainly:
+
+- **False alarms are rare (good).** Genuine student writing almost
+  never strongly flags against itself — 258 of 300 essays fully
+  consistent across all three thirds.
+- **Same-prompt catch rate is weak (limitation).** Different students
+  answering the same prompt write similarly enough that only 11.3%
+  flag at all, 2.0% strongly. Topic-locked school writing is
+  homogeneous; the tool's strength is strongly divergent work
+  (our LLM-polished suspect scores 2.0 — far above this whole
+  distribution), not subtle same-assignment substitution.
+- Caveats both ways: thirds share topic/vocabulary (optimistic for
+  within-rates) but are short and same-prompt (pessimistic for
+  cross-rates). Fixture essays in `samples/asap/` (with `SOURCE.md`
+  attribution); study script kept out of the repo, method above is
+  the full spec.
+
 Try the bundled demo: the genuine homework reads **CONSISTENT**
 (score ~0.8) while the suspect piece reads **WORTH A CONVERSATION**
 (score ~2.0), with the divergent habits listed per feature.
@@ -173,5 +203,6 @@ Two warnings, both serious:
 - [x] Local browser UI + print-friendly report (`writeprint serve`, v1.2)
 - [x] Two-student validation corpus + CSV batch export (`writeprint batch`, v1.3)
 - [x] Real-prose validation: Gutenberg corpus, honest negative result (v1.4)
-- [ ] Larger validation corpus (real classroom data)
+- [x] Real student writing: ASAP false-flag study, published rates (v1.5)
+- [ ] Classroom pilot: multi-sample baselines from live student work
 - [ ] Optional LLM judge for nuanced cases (v1 is fully offline by design)

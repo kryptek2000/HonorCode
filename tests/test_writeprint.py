@@ -197,5 +197,58 @@ class TestGutenberg(unittest.TestCase):
                 self.assertEqual(result["band"], "consistent", msg=result)
 
 
+ASAP_IDS = ("679", "318", "825", "1362")
+ASAP_DIR = os.path.join(SAMPLES, "asap")
+
+
+def asap_text(eid):
+    with open(os.path.join(ASAP_DIR, "asap_set1_id%s.txt" % eid),
+              encoding="utf-8") as fh:
+        return fh.read()
+
+
+def thirds(text):
+    words = text.split()
+    n = len(words) // 3
+    return [" ".join(words[:n]), " ".join(words[n:2 * n]),
+            " ".join(words[2 * n:])]
+
+
+class TestASAP(unittest.TestCase):
+    """De-identified real student essays (ASAP set 1, persuasive letters).
+
+    Fixture essays live in samples/asap/ with SOURCE.md attribution.
+    Full study (300 essays): 95.1% of within-essay chunk checks read
+    consistent; same-prompt cross-student checks flag only 11.3%.
+    """
+
+    def test_within_essay_never_strong_flags(self):
+        # No chunk of genuine student writing may read
+        # "worth a conversation" against the rest of its own essay.
+        for eid in ASAP_IDS:
+            with self.subTest(essay=eid):
+                scores = loo_genuine_scores(thirds(asap_text(eid)))
+                self.assertLess(max(scores), 1.5, msg=scores)
+
+    def test_majority_fully_consistent(self):
+        fully = 0
+        for eid in ASAP_IDS:
+            scores = loo_genuine_scores(thirds(asap_text(eid)))
+            if all(s < 1.2 for s in scores):
+                fully += 1
+        self.assertGreaterEqual(fully, 3)
+
+    def test_same_prompt_cross_stays_consistent(self):
+        # Documents the measured limitation: same-prompt writing by
+        # different real students does NOT separate at default bands.
+        base = build_baseline(
+            [extract(c) for c in thirds(asap_text("679"))])
+        for eid in ASAP_IDS:
+            with self.subTest(essay=eid):
+                chunk = thirds(asap_text(eid))[0]
+                result = compare(extract(chunk), base)
+                self.assertEqual(result["band"], "consistent", msg=result)
+
+
 if __name__ == "__main__":
     unittest.main()
