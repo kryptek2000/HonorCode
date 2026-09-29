@@ -14,6 +14,7 @@ from .calibrate import (
     recommend,
     render_table,
 )
+from .web import DEFAULT_PORT, serve
 
 
 def cmd_build(args):
@@ -41,6 +42,10 @@ def cmd_check(args):
         bands = (BAND_CONSISTENT, cfg["flag_threshold"])
     result = compare(extract(text), baseline, bands=bands)
     print(render_report(baseline.get("student", "?"), args.submission, result))
+
+
+def cmd_serve(args):
+    serve(args.port)
 
 
 def cmd_calibrate(args):
@@ -102,6 +107,11 @@ def main(argv=None):
     p_cal.add_argument("-o", "--out", default=None,
                        help="Write recommended thresholds JSON for 'check --thresholds'.")
     p_cal.set_defaults(func=cmd_calibrate)
+
+    p_serve = sub.add_parser("serve", help="Serve the local browser UI (127.0.0.1 only).")
+    p_serve.add_argument("--port", type=int, default=DEFAULT_PORT,
+                         help="Local port (default %d)." % DEFAULT_PORT)
+    p_serve.set_defaults(func=cmd_serve)
 
     args = parser.parse_args(argv)
     args.func(args)

@@ -33,6 +33,19 @@ python -m writeprint.cli check baselines/student_a.json \
     samples/student_a_homework_genuine.txt
 ```
 
+## Browser UI (no dependencies, runs offline)
+
+```bash
+python -m writeprint.cli serve
+# → open http://127.0.0.1:8765
+```
+
+Paste 2+ baseline samples and a submission into the page and get the
+report rendered with band coloring — plus a print-friendly layout for
+parent/teacher conferences (just hit *Print report*). The server binds
+to localhost only, ships zero external assets, and makes zero network
+calls: student text never leaves the machine.
+
 Try the bundled demo: the genuine homework reads **CONSISTENT**
 (score ~0.8) while the suspect piece reads **WORTH A CONVERSATION**
 (score ~2.0), with the divergent habits listed per feature.
@@ -99,7 +112,7 @@ Two warnings, both serious:
 ## Roadmap
 
 - [x] Per-classroom calibration helper (`writeprint calibrate`, v1.1)
+- [x] Local browser UI + print-friendly report (`writeprint serve`, v1.2)
 - [ ] More baselines + larger validation corpus
-- [ ] HTML report for parent/teacher conferences
 - [ ] Optional LLM judge for nuanced cases (v1 is fully offline by design)
 - [ ] CSV export for gradebook-adjacent workflows
