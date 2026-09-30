@@ -22,81 +22,153 @@ PAGE = """<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>HonorCode — authorship check</title>
 <style>
-  :root { --green: #1a7f37; --amber: #9a6700; --red: #b42318;
-          --ink: #1f2328; --muted: #59636e; --line: #d0d7de; --bg: #f6f8fa; }
-  * { box-sizing: border-box; }
-  body { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
-         color: var(--ink); margin: 0; background: #fff; }
-  header { background: var(--bg); border-bottom: 1px solid var(--line);
-           padding: 20px 28px; }
-  header h1 { margin: 0 0 4px; font-size: 22px; }
-  header p { margin: 0; color: var(--muted); font-size: 14px; }
-  main { max-width: 860px; margin: 0 auto; padding: 24px 28px 60px; }
-  label { display: block; font-weight: 600; margin: 18px 0 6px; }
-  .hint { font-weight: 400; color: var(--muted); font-size: 13px; }
-  input[type=text] { width: 100%; padding: 8px 10px; font-size: 15px;
-                     border: 1px solid var(--line); border-radius: 6px; }
-  textarea { width: 100%; min-height: 110px; padding: 8px 10px; font-size: 14px;
-             border: 1px solid var(--line); border-radius: 6px; resize: vertical; }
-  .row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-  button { margin-top: 20px; padding: 10px 22px; font-size: 15px; font-weight: 600;
-           color: #fff; background: #0969da; border: 0; border-radius: 6px;
-           cursor: pointer; }
-  button:hover { background: #0550ae; }
-  button.secondary { background: #fff; color: var(--ink);
-                     border: 1px solid var(--line); margin-left: 8px; }
-  #error { display: none; margin-top: 16px; padding: 12px 14px; font-size: 14px;
-           color: var(--red); background: #ffebe9; border: 1px solid #ff8182;
-           border-radius: 6px; }
-  #report { display: none; margin-top: 24px; border: 1px solid var(--line);
-            border-radius: 8px; padding: 20px 22px; }
-  #report .band { display: inline-block; padding: 4px 14px; border-radius: 999px;
-                  color: #fff; font-weight: 700; font-size: 15px; }
-  #report .band.consistent { background: var(--green); }
-  #report .band.mild { background: var(--amber); }
-  #report .band.review { background: var(--red); }
-  #report .score { font-size: 28px; font-weight: 700; margin: 10px 0 2px; }
-  #report table { width: 100%; border-collapse: collapse; margin-top: 14px;
-                  font-size: 13px; }
-  #report th, #report td { text-align: left; padding: 6px 8px;
-                           border-bottom: 1px solid var(--line); }
-  #report th { color: var(--muted); font-weight: 600; }
-  #report .note { margin-top: 16px; font-size: 13px; color: var(--muted);
-                  border-top: 1px solid var(--line); padding-top: 12px; }
-  @media print {
-    header, #input-section, #actions { display: none; }
-    main { max-width: none; padding: 0; }
-    #report { display: block !important; border: none; }
+  :root {
+    --paper: #f7f4ec; --card: #fffdf8; --ink: #1c1814; --muted: #5f574d;
+    --hair: #ddd3bf; --gold: #a8842c; --oxford: #23406b;
+    --green: #1e7e46; --amber: #9a6700; --red: #b42318;
+    --serif: "Didot", "Bodoni MT", "Playfair Display", Georgia, "Times New Roman", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   }
-  @media (max-width: 700px) { .row { grid-template-columns: 1fr; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink);
+         font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+  .rule-gold { height: 4px; background: linear-gradient(90deg, var(--gold), #d9bd7a 40%, var(--gold)); }
+  .masthead { max-width: 960px; margin: 0 auto; padding: 34px 32px 22px;
+              display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; }
+  .overline { font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+              color: var(--muted); margin: 0 0 8px; }
+  .masthead h1 { font-family: var(--serif); font-weight: 400; font-size: 46px;
+                 margin: 0; letter-spacing: 0.5px; }
+  .masthead h1 em { font-style: italic; }
+  .stamp { flex-shrink: 0; font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+           color: var(--oxford); border: 1px solid var(--oxford); border-radius: 4px;
+           padding: 8px 12px; opacity: 0.9; text-align: center; }
+  main { max-width: 960px; margin: 0 auto; padding: 6px 32px 70px; }
+  .card { background: var(--card); border: 1px solid var(--hair); border-radius: 4px;
+          box-shadow: 0 1px 2px rgba(28,24,20,0.05), 0 12px 32px -18px rgba(28,24,20,0.25);
+          padding: 28px 30px; }
+  .secnum { font-family: var(--serif); font-style: italic; color: var(--gold);
+            font-size: 15px; margin-right: 8px; }
+  label.seclabel { display: block; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+                   color: var(--muted); margin: 24px 0 8px; font-weight: 600; }
+  label.seclabel:first-child { margin-top: 0; }
+  .hint { text-transform: none; letter-spacing: 0; font-weight: 400; font-size: 13px; }
+  input[type=text] { width: 100%; padding: 10px 12px; font-size: 16px; font-family: var(--serif);
+                     background: #fff; color: var(--ink);
+                     border: 1px solid var(--hair); border-radius: 4px; }
+  textarea { width: 100%; min-height: 118px; padding: 10px 12px; font-size: 14px; line-height: 1.55;
+             font-family: var(--sans); background: #fff; color: var(--ink);
+             border: 1px solid var(--hair); border-radius: 4px; resize: vertical; }
+  input:focus, textarea:focus { outline: 2px solid var(--oxford); outline-offset: 1px; border-color: var(--oxford); }
+  .row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  #actions { margin-top: 26px; display: flex; gap: 10px; align-items: center; }
+  button { padding: 12px 26px; font-size: 14px; letter-spacing: 1.5px; text-transform: uppercase;
+           font-weight: 700; color: #fffdf8; background: var(--ink);
+           border: 1px solid var(--ink); border-radius: 4px; cursor: pointer;
+           transition: background 0.15s ease, transform 0.1s ease; }
+  button:hover { background: #000; }
+  button:active { transform: translateY(1px); }
+  button.secondary { background: transparent; color: var(--ink); border: 1px solid var(--hair); }
+  button.secondary:hover { border-color: var(--ink); background: transparent; }
+  ::placeholder { color: #8a8177; opacity: 1; }
+  .legend { margin-top: 22px; border-top: 1px solid var(--hair); padding-top: 14px;
+            display: grid; gap: 7px; }
+  .legend div { font-size: 13px; color: var(--muted); }
+  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 8px; }
+  .fineprint { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  #error { display: none; margin-top: 18px; padding: 12px 16px; font-size: 14px;
+           color: var(--red); background: #fbeeec; border-left: 3px solid var(--red); }
+  #report { display: none; margin-top: 28px; animation: rise 0.35s ease; }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  .rep-head { text-align: center; border-bottom: 1px solid var(--hair); padding-bottom: 18px; }
+  .rep-head .overline { margin-bottom: 6px; }
+  .rep-head h2 { font-family: var(--serif); font-weight: 400; font-size: 30px; margin: 0; }
+  .rep-head .sub { color: var(--muted); font-size: 13px; margin-top: 6px; }
+  .verdict { display: flex; gap: 28px; align-items: center; padding: 22px 6px 6px; }
+  .gauge { flex-shrink: 0; }
+  .vtext .band { display: inline-block; padding: 5px 16px; border-radius: 999px;
+                 color: #fff; font-weight: 700; font-size: 14px; letter-spacing: 1.5px;
+                 text-transform: uppercase; }
+  .vtext .band.consistent { background: var(--green); }
+  .vtext .band.mild { background: var(--amber); }
+  .vtext .band.review { background: var(--red); }
+  .vtext .mean { font-size: 13px; color: var(--muted); margin-top: 10px; line-height: 1.6; max-width: 420px; }
+  #report table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
+  #report th { text-align: left; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+               color: var(--muted); font-weight: 600; padding: 8px 10px;
+               border-bottom: 1px solid var(--ink); }
+  #report td { padding: 8px 10px; border-bottom: 1px solid var(--hair); vertical-align: middle; }
+  #report td code { font-size: 12px; background: var(--paper); padding: 1px 5px; border-radius: 4px; }
+  .zbar { height: 5px; background: #ece5d3; border-radius: 4px; min-width: 70px; }
+  .zbar i { display: block; height: 5px; border-radius: 4px; background: var(--oxford); }
+  #report .note { margin-top: 20px; font-size: 13px; line-height: 1.65; color: var(--muted);
+                  border: 1px solid var(--hair); background: var(--paper);
+                  padding: 12px 16px; border-radius: 4px; }
+  #report .note strong { color: var(--ink); }
+  footer { max-width: 960px; margin: 0 auto; padding: 0 32px 40px;
+           display: flex; justify-content: space-between; gap: 12px;
+           font-size: 12px; color: var(--muted); }
+  footer a { color: var(--oxford); }
+  @media print {
+    body { background: #fff; }
+    #input-section, #actions, footer, .rule-gold { display: none; }
+    main { max-width: none; padding: 0 8px; }
+    .card { box-shadow: none; }
+    #report { display: block !important; animation: none; }
+  }
+  @media (max-width: 700px) {
+    .row { grid-template-columns: 1fr; }
+    .masthead { flex-direction: column; align-items: flex-start; }
+    .masthead h1 { font-size: 34px; }
+    .verdict { flex-direction: column; }
+  }
 </style>
 </head>
 <body>
-<header>
-  <h1>✒️ HonorCode</h1>
-  <p>Authorship verification for the classroom — advisory only, never a verdict.</p>
-</header>
+<div class="rule-gold"></div>
+<div class="masthead">
+  <div>
+    <p class="overline">Authorship verification &middot; For the classroom</p>
+    <h1>Honor<em>Code</em></h1>
+  </div>
+  <div class="stamp">Advisory only<br>Never a verdict</div>
+</div>
 <main>
-  <div id="input-section">
-    <label>Student name</label>
+  <div class="card" id="input-section">
+    <label class="seclabel"><span class="secnum">01.</span>Student</label>
     <input type="text" id="student" value="student_a">
-    <label>Baseline samples <span class="hint">— 2+ pieces of known-genuine writing by this student</span></label>
+    <label class="seclabel"><span class="secnum">02.</span>Baseline samples
+      <span class="hint">&mdash; two or more pieces of known-genuine writing</span></label>
     <div class="row">
       <textarea id="b1" placeholder="Baseline sample 1"></textarea>
       <textarea id="b2" placeholder="Baseline sample 2"></textarea>
       <textarea id="b3" placeholder="Baseline sample 3 (optional)"></textarea>
     </div>
-    <label>Submission to check</label>
-    <textarea id="sub" style="min-height:140px" placeholder="Paste the submission here"></textarea>
+    <label class="seclabel"><span class="secnum">03.</span>Submission under examination</label>
+    <textarea id="sub" style="min-height:150px" placeholder="Paste the submission here"></textarea>
     <div id="actions">
-      <button onclick="check()">Check submission</button>
+      <button onclick="check()">Examine submission</button>
       <button class="secondary" onclick="window.print()">Print report</button>
+    </div>
+    <div class="legend">
+      <div><span class="dot" style="background:#1e7e46"></span><strong>Consistent</strong> &mdash; within this student&rsquo;s own variation.</div>
+      <div><span class="dot" style="background:#9a6700"></span><strong>Mild divergence</strong> &mdash; some habits drift; worth a look, not a conclusion.</div>
+      <div><span class="dot" style="background:#b42318"></span><strong>Worth a conversation</strong> &mdash; several habits diverge; talk, don&rsquo;t accuse.</div>
     </div>
     <div id="error"></div>
   </div>
-  <div id="report"></div>
+  <div class="card" id="report"></div>
 </main>
+<footer>
+  <span>HonorCode &middot; human-in-the-loop, never a verdict.</span>
+  <span>Local only &mdash; text never leaves this machine. <a href="https://github.com/kryptek2000/HonorCode">Source</a></span>
+</footer>
 <script>
+var BAND_MEANING = {
+  "consistent": "Within the range of this student's own variation.",
+  "mild divergence": "Some habits drift from baseline — worth a look, not a conclusion.",
+  "worth a conversation": "Several independent habits diverge. Time for a conversation, not an accusation."
+};
 async function check() {
   const err = document.getElementById("error");
   const rep = document.getElementById("report");
@@ -121,20 +193,41 @@ async function check() {
   }
   const cls = data.band === "consistent" ? "consistent"
             : data.band === "mild divergence" ? "mild" : "review";
-  let rows = data.flags.map(f =>
-    "<tr><td><code>" + f.feature + "</code></td><td>" + f.value.toFixed(3) +
-    "</td><td>" + f.baseline_mean.toFixed(3) + "</td><td>" + f.z.toFixed(2) + "</td></tr>"
-  ).join("");
-  if (!rows) rows = '<tr><td colspan="4">No strongly divergent habits.</td></tr>';
+  const ink = cls === "consistent" ? "#1e7e46" : cls === "mild" ? "#9a6700" : "#b42318";
+  const pct = Math.min(data.score / 3, 1) * 100;
+  let rows = data.flags.map(f => {
+    const w = Math.min(f.z / 5 * 100, 100).toFixed(0);
+    const zshow = f.z >= 5 ? "≥5" : f.z.toFixed(2);
+    return "<tr><td><code>" + f.feature + "</code></td><td>" + f.value.toFixed(3) +
+      "</td><td>" + f.baseline_mean.toFixed(3) + "</td>" +
+      "<td><div class='zbar'><i style='width:" + w + "%;background:" + ink + "'></i></div></td>" +
+      "<td>" + zshow + "</td></tr>";
+  }).join("");
+  if (!rows) rows = '<tr><td colspan="5">No strongly divergent habits.</td></tr>';
   const today = new Date().toLocaleDateString();
   rep.innerHTML =
-    "<div><strong>HonorCode report</strong> — " + escapeHtml(student) + " — " + today + "</div>" +
-    '<div class="score">' + data.score.toFixed(3) + "</div>" +
-    '<span class="band ' + cls + '">' + data.band.toUpperCase() + "</span>" +
-    "<table><tr><th>Habit</th><th>Submission</th><th>Baseline avg</th><th>z</th></tr>" +
+    '<div class="rep-head"><p class="overline">Report of examination</p>' +
+    "<h2>" + escapeHtml(student) + "</h2>" +
+    '<div class="sub">' + today + " &middot; mean absolute z " + data.score.toFixed(3) + " vs. baseline</div></div>" +
+    '<div class="verdict">' +
+    '<svg class="gauge" width="190" height="118" viewBox="0 0 200 130">' +
+    '<path d="M 20 105 A 80 80 0 0 1 180 105" fill="none" stroke="#ece5d3" stroke-width="16"/>' +
+    '<path d="M 20 105 A 80 80 0 0 1 180 105" fill="none" stroke="' + ink + '" stroke-width="16" pathLength="100" stroke-dasharray="' + pct.toFixed(1) + ' 100"/>' +
+    '<line x1="75.3" y1="28.9" x2="75.3" y2="38" stroke="#5f574d" stroke-width="1"/>' +
+    '<line x1="100" y1="25" x2="100" y2="34" stroke="#5f574d" stroke-width="1"/>' +
+    '<text x="75.3" y="22" font-size="9" text-anchor="middle" fill="#5f574d">1.2</text>' +
+    '<text x="100" y="18" font-size="9" text-anchor="middle" fill="#5f574d">1.5</text>' +
+    '<text x="20" y="122" font-size="9" text-anchor="middle" fill="#5f574d">0</text>' +
+    '<text x="180" y="122" font-size="9" text-anchor="middle" fill="#5f574d">3+</text>' +
+    '<text x="100" y="97" font-size="26" text-anchor="middle" font-weight="bold" fill="#1c1814">' + data.score.toFixed(2) + "</text></svg>" +
+    '<div class="vtext"><span class="band ' + cls + '">' + data.band + "</span>" +
+    '<div class="mean">' + BAND_MEANING[data.band] + "</div></div></div>" +
+    '<table><tr><th>Habit</th><th>Submission</th><th>Baseline</th><th colspan="2">Divergence (z)</th></tr>' +
     rows + "</table>" +
-    '<div class="note">This report flags writing habits worth a conversation. ' +
-    "It does not determine who wrote a text. A teacher always decides what happens next.</div>";
+    '<div class="fineprint">z caps at 5, so no single habit dominates the overall score.</div>' +
+    '<div class="note"><strong>Advisory only.</strong> This report flags writing habits ' +
+    "worth a conversation. It does not determine who wrote a text. " +
+    "A teacher always decides what happens next.</div>";
   rep.style.display = "block";
   rep.scrollIntoView();
 }
