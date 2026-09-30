@@ -2,6 +2,9 @@
 
 **Authorship verification for the classroom — not an AI detector.**
 
+![HonorCode browser UI — input form](docs/form.png)
+![HonorCode report of examination](docs/report.png)
+
 HonorCode compares a student's submission against that student's *own*
 known-genuine writing and reports how far their writing habits diverge.
 The output is a reading — *consistent*, *mild divergence*, or

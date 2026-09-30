@@ -213,10 +213,10 @@ async function check() {
     '<svg class="gauge" width="190" height="118" viewBox="0 0 200 130">' +
     '<path d="M 20 105 A 80 80 0 0 1 180 105" fill="none" stroke="#ece5d3" stroke-width="16"/>' +
     '<path d="M 20 105 A 80 80 0 0 1 180 105" fill="none" stroke="' + ink + '" stroke-width="16" pathLength="100" stroke-dasharray="' + pct.toFixed(1) + ' 100"/>' +
-    '<line x1="75.3" y1="28.9" x2="75.3" y2="38" stroke="#5f574d" stroke-width="1"/>' +
-    '<line x1="100" y1="25" x2="100" y2="34" stroke="#5f574d" stroke-width="1"/>' +
-    '<text x="75.3" y="22" font-size="9" text-anchor="middle" fill="#5f574d">1.2</text>' +
-    '<text x="100" y="18" font-size="9" text-anchor="middle" fill="#5f574d">1.5</text>' +
+    '<line x1="75.3" y1="36" x2="75.3" y2="46" stroke="#5f574d" stroke-width="1"/>' +
+    '<line x1="100" y1="33" x2="100" y2="41" stroke="#5f574d" stroke-width="1"/>' +
+    '<text x="70" y="57" font-size="10" text-anchor="middle" fill="#5f574d">1.2</text>' +
+    '<text x="103" y="51" font-size="10" text-anchor="middle" fill="#5f574d">1.5</text>' +
     '<text x="20" y="122" font-size="9" text-anchor="middle" fill="#5f574d">0</text>' +
     '<text x="180" y="122" font-size="9" text-anchor="middle" fill="#5f574d">3+</text>' +
     '<text x="100" y="97" font-size="26" text-anchor="middle" font-weight="bold" fill="#1c1814">' + data.score.toFixed(2) + "</text></svg>" +
